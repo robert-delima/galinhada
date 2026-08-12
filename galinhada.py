@@ -30,7 +30,7 @@ def calcular_galinhas(quantidade_galinhas, dias):
     print(f'Custo da ração: R$ {custo_racao:.2f}')
     print(f'Resultado após ração: R$ {lucro:.2f}')
 
-def consultar_por_data_inicio_fim():
+def consultar_por_periodo():
     data_inicial = input('Digite a data Inicial (AAAA-MM-DD): ')
     data_final = input('Digite a data Final (AAAA-MM-DD): ')
 
@@ -77,7 +77,7 @@ def consultar_por_data():
         print(f'Ração Utilizada: {registro[4]:.2f} kg')
 
 
-def total_ovos():
+def relatorio_producao():
     cursor.execute("""
         SELECT SUM(quantidade_ovos), SUM(racao_kg)
         FROM producao
@@ -85,6 +85,8 @@ def total_ovos():
 
     resultado = cursor.fetchone()
 
+    print('-'*30)
+    print()
     print(f'Total de ovos produzidos: {resultado[0]}')
     print(f'Total de ração utilizada: {resultado[1]:.2f} kg')
 
@@ -114,13 +116,23 @@ def registrar_producao():
     racao_utilizada = float(input('Quantos kg de ração: '))
     data = date.today().isoformat()
 
-    cursor.execute("""
-        INSERT INTO producao (data, quantidade_galinhas, 
-        quantidade_ovos, racao_kg)
-        VALUES (?, ?, ?, ?)
-    """, (data, quantidade_galinhas, quantidade_ovos, racao_utilizada))
+    try:
+        cursor.execute("""
+            INSERT INTO producao (data, quantidade_galinhas, 
+            quantidade_ovos, racao_kg)
+            VALUES (?, ?, ?, ?)
+        """, (data, quantidade_galinhas, quantidade_ovos, racao_utilizada))
 
-    conexao.commit()
+        conexao.commit()
+
+        print()
+        print('Registro Concluido com Sucesso!')
+        print()
+
+    except sqlite3.Error as erro:
+        print()
+        print(f'Erro ao registrar produção: {erro}')
+        print()
 
 def quantas_galinhas():
     while True:
@@ -131,22 +143,90 @@ def quantas_galinhas():
         else:
             return quantidade_galinhas
 
+def menu_calculadora():
+    while True:
+        print('===== CALCULADORA DE PROJEÇÃO =====')
+        print()
+        print('1 - Diario')
+        print('2 - Semanal')
+        print('3 - Mensal')
+        print('4 - Vida Útil')
+        print('5 - Personalizado')
+        print('6 - Voltar')
+
+        opcao_calculadora = int(input('Opção: '))
+
+        if opcao_calculadora == 1:
+            quantidade_galinhas = quantas_galinhas()
+
+            print('-' * 20)
+            print('    DIARIO')
+            print()
+            calcular_galinhas(quantidade_galinhas, 1)
+            print()
+            print('-' * 20)
+
+        elif opcao_calculadora == 2:
+            quantidade_galinhas = quantas_galinhas()
+
+            print('-' * 20)
+            print('    SEMANAL')
+            print()
+            calcular_galinhas(quantidade_galinhas, 7)
+            print()
+            print('-' * 20)
+
+        elif opcao_calculadora == 3:
+            quantidade_galinhas = quantas_galinhas()
+
+            print('-' * 20)
+            print('    MENSAL')
+            print()
+            calcular_galinhas(quantidade_galinhas, 30)
+            print()
+            print('-' * 20)
+
+        elif opcao_calculadora == 4:
+            quantidade_galinhas = quantas_galinhas()
+
+            print('-' * 20)
+            print('    VIDA UTIL')
+            print()
+            calcular_galinhas(quantidade_galinhas, 700)
+            print()
+            print('-' * 20)
+
+        elif opcao_calculadora == 5:
+            quantidade_galinhas = quantas_galinhas()
+
+            print('-' * 20)
+            print('    PERSONALIZADO')
+            print()
+            dias_personalizado = int(input('Quantos Dias?: '))
+
+            if dias_personalizado <= 0:
+                print('Quantidade de dias inválida.')
+                continue
+
+            calcular_galinhas(quantidade_galinhas, dias_personalizado)
+            print()
+            print('-' * 20)
+
+        elif opcao_calculadora == 6:
+            break
+
 def menu():
     print('='*25)
     print('     GALINHADA')
     print('='*25)
     print()
-    print('1 - Gestão Diaria')
-    print('2 - Gestão Semanal')
-    print('3 - Gestão Mensal')
-    print('4 - Gestão Vida Ùtil (100 semanas)')
-    print('5 - Gestão Personalizada')
-    print('6 - Registrar Produção')
-    print('7 - Consultar Produção')
-    print('8 - Sair.')
-    print('9 - Função Teste Soma Total')
-    print('10 - Função Teste Consultar Data')
-    print('11 - Função teste consultar por data determinada')
+    print('1 - Registrar Produção')
+    print('2 - Consultar Produção')
+    print('3 - Consultar Produção por Data')
+    print('4 - Consultar Produção por Período')
+    print('5 - Relatório de Produção')
+    print('6 - Calculadora de Projeção')
+    print('7 - Sair')
     print()
 
 while True:
@@ -154,67 +234,24 @@ while True:
     opcao = int(input('Opção: '))
 
     if opcao == 1:
-        quantidade_galinhas = quantas_galinhas()
-
-        print('-'*20)
-        print('    DIARIO')
-        print()
-        calcular_galinhas(quantidade_galinhas, 1)
-        print()
-        print('-' * 20)
-
-    elif opcao == 2:
-        quantidade_galinhas = quantas_galinhas()
-
-        print('-' * 20)
-        print('    SEMANAL')
-        print()
-        calcular_galinhas(quantidade_galinhas, 7)
-        print()
-        print('-' * 20)
-
-    elif opcao == 3:
-        quantidade_galinhas = quantas_galinhas()
-
-        print('-' * 20)
-        print('    MENSAL')
-        print()
-        calcular_galinhas(quantidade_galinhas, 30)
-        print()
-        print('-' * 20)
-
-    elif opcao == 4:
-        quantidade_galinhas = quantas_galinhas()
-
-        print('-' * 20)
-        print('    VIDA UTIL')
-        print()
-        calcular_galinhas(quantidade_galinhas, 700)
-        print()
-        print('-' * 20)
-
-    elif opcao == 5:
-        quantidade_galinhas = quantas_galinhas()
-
-        print('-' * 20)
-        print('    PERSONALIZADO')
-        print()
-        dias_personalizado = int(input('Quantos Dias?: '))
-
-        if dias_personalizado <= 0:
-            print('Quantidade de dias inválida.')
-            continue
-
-        calcular_galinhas(quantidade_galinhas, dias_personalizado)
-        print()
-        print('-' * 20)
-    elif opcao == 6:
         registrar_producao()
 
-    elif opcao == 7:
+    elif opcao == 2:
         consultar_producao()
 
-    elif opcao == 8:
+    elif opcao == 3:
+        consultar_por_data()
+
+    elif opcao == 4:
+        consultar_por_periodo()
+
+    elif opcao == 5:
+        relatorio_producao()
+
+    elif opcao == 6:
+        menu_calculadora()
+
+    elif opcao == 7:
         print()
         print('=' * 35)
         print('Obrigado por utilizar o programa!')
@@ -227,14 +264,6 @@ while True:
 
         input('\nPressione ENTER para fechar...')
         break
-    elif opcao == 9:
-        total_ovos()
-
-    elif opcao == 10:
-        consultar_por_data()
-
-    elif opcao == 11:
-        consultar_por_data_inicio_fim()
 
     else:
         print('Operação Invalida, tente novamente')
