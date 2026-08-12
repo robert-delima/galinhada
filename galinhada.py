@@ -15,6 +15,52 @@ cursor.execute("""
     );
 """)
 
+def deletar_producao():
+    id_producao = int(input('ID da Produção: '))
+    print()
+
+    cursor.execute("""
+        DELETE FROM producao
+        WHERE id = ?
+        """, (id_producao,))
+
+    if cursor.rowcount == 0:
+        print()
+        print('Produção não encontrada')
+        print()
+
+    else:
+        conexao.commit()
+
+        print()
+        print('Produção Apagada com sucesso!')
+        print()
+
+def editar_producao():
+    id_producao = int(input('ID da Produção: '))
+    nova_quantidade_ovos = int(input('Nova Quantidade de Ovos: '))
+    print()
+
+    cursor.execute("""
+                   UPDATE producao
+                   SET quantidade_ovos = ?
+                   WHERE id = ?
+                   """, (nova_quantidade_ovos, id_producao))
+
+    if cursor.rowcount == 0:
+        print()
+        print('Produção não encontrada')
+        print()
+
+    else:
+        conexao.commit()
+
+        print()
+        print('Produção atualizada com sucesso!')
+        print()
+
+
+
 def calcular_galinhas(quantidade_galinhas, dias):
     ovos = quantidade_galinhas * dias
     racao_em_gramas = quantidade_galinhas * 126 * dias
@@ -225,8 +271,10 @@ def menu():
     print('3 - Consultar Produção por Data')
     print('4 - Consultar Produção por Período')
     print('5 - Relatório de Produção')
-    print('6 - Calculadora de Projeção')
-    print('7 - Sair')
+    print('6 - Editar Produção')
+    print('7 - Excluir Produção')
+    print('8 - Calculadora de Projeção')
+    print('9 - Sair')
     print()
 
 while True:
@@ -249,9 +297,15 @@ while True:
         relatorio_producao()
 
     elif opcao == 6:
-        menu_calculadora()
+        editar_producao()
 
     elif opcao == 7:
+        deletar_producao()
+
+    elif opcao == 8:
+        menu_calculadora()
+
+    elif opcao == 9:
         print()
         print('=' * 35)
         print('Obrigado por utilizar o programa!')
