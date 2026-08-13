@@ -37,29 +37,13 @@ def deletar_producao():
         print()
 
 def editar_producao():
-    id_producao = int(input('ID da Produção: '))
-    nova_quantidade_ovos = int(input('Nova Quantidade de Ovos: '))
+    escolha_id = int(input('Digite o ID: '))
     print()
 
-    cursor.execute("""
-                   UPDATE producao
-                   SET quantidade_ovos = ?
-                   WHERE id = ?
-                   """, (nova_quantidade_ovos, id_producao))
+    producao_encontrada = mostrar_producao(escolha_id)
 
-    if cursor.rowcount == 0:
-        print()
-        print('Produção não encontrada')
-        print()
-
-    else:
-        conexao.commit()
-
-        print()
-        print('Produção atualizada com sucesso!')
-        print()
-
-
+    if producao_encontrada is True:
+        menu_editar(escolha_id)
 
 def calcular_galinhas(quantidade_galinhas, dias):
     ovos = quantidade_galinhas * dias
@@ -99,7 +83,6 @@ def consultar_por_periodo():
         print(f'Total de ovos no período: {resultado[0]}')
         print(f'Total de ração no período: {resultado[1]:.2f} kg')
 
-
 def consultar_por_data():
     data = input('Digite a data (AAAA-MM-DD): ')
 
@@ -122,7 +105,6 @@ def consultar_por_data():
         print(f'Ovos Produzidos: {registro[3]}')
         print(f'Ração Utilizada: {registro[4]:.2f} kg')
 
-
 def relatorio_producao():
     cursor.execute("""
         SELECT SUM(quantidade_ovos), SUM(racao_kg)
@@ -135,7 +117,6 @@ def relatorio_producao():
     print()
     print(f'Total de ovos produzidos: {resultado[0]}')
     print(f'Total de ração utilizada: {resultado[1]:.2f} kg')
-
 
 def consultar_producao():
     cursor.execute("""
@@ -154,7 +135,6 @@ def consultar_producao():
         print(f'Ovos Produzidos: {registro[3]}')
         print(f'Ração Utilizada: {registro[4]:.2f} kg')
         print()
-
 
 def registrar_producao():
     quantidade_galinhas = int(input('Quantas Galinhas: '))
@@ -188,6 +168,104 @@ def quantas_galinhas():
             print('Quantidade Invalida')
         else:
             return quantidade_galinhas
+
+def mostrar_producao(escolha_id):
+    cursor.execute("""
+                   SELECT *
+                   FROM producao
+                   WHERE id = ?
+                   """, (escolha_id,))
+
+    registro = cursor.fetchone()
+
+    if registro is None:
+        print('Produção não encontrada.')
+        print()
+
+    else:
+        print(f'ID: {registro[0]}')
+        print(f'Data: {registro[1]}')
+        print(f'Galinhas: {registro[2]}')
+        print(f'Ovos: {registro[3]}')
+        print(f'Ração: {registro[4]:.2f} kg')
+        print()
+        return True
+
+def menu_editar(escolha_id):
+    while True:
+        print('===== EDITAR PRODUÇÃO =====')
+        print()
+        print('1 - Data')
+        print('2 - Quantidade de Galinhas')
+        print('3 - Quantidade de Ovos')
+        print('4 - Ração Utilizada')
+        print('5 - Voltar')
+        print()
+        opcao_editar = int(input('Opção: '))
+
+        if opcao_editar == 1:
+            nova_data = input('Digite a nova data (AAAA-MM-DD): ')
+            cursor.execute("""
+                           UPDATE producao
+                           SET data = ?
+                           WHERE id = ?
+                           """, (nova_data, escolha_id))
+
+            conexao.commit()
+
+            print()
+            print('Produção atualizada com sucesso!')
+            print()
+            mostrar_producao(escolha_id)
+
+        elif opcao_editar == 2:
+            nova_quantidade = int(input('Digite a nova Quantidade de Galinhas: '))
+            cursor.execute("""
+                           UPDATE producao
+                           SET quantidade_galinhas = ?
+                           WHERE id = ?
+                           """, (nova_quantidade, escolha_id))
+
+            conexao.commit()
+
+            print()
+            print('Produção atualizada com sucesso!')
+            print()
+            mostrar_producao(escolha_id)
+
+        elif opcao_editar == 3:
+            novo_ovos = int(input('Digite a nova Quantidade de Ovos: '))
+            cursor.execute("""
+                           UPDATE producao
+                           SET quantidade_ovos = ?
+                           WHERE id = ?
+                           """, (novo_ovos, escolha_id))
+
+            conexao.commit()
+
+            print()
+            print('Produção atualizada com sucesso!')
+            print()
+            mostrar_producao(escolha_id)
+
+        elif opcao_editar == 4:
+            novo_racao = float(input('Digite a nova Quantidade de Ração: '))
+            cursor.execute("""
+                           UPDATE producao
+                           SET racao_kg = ?
+                           WHERE id = ?
+                           """, (novo_racao, escolha_id))
+
+            conexao.commit()
+
+            print()
+            print('Produção atualizada com sucesso!')
+            print()
+            mostrar_producao(escolha_id)
+
+        elif opcao_editar == 5:
+            break
+
 
 def menu_calculadora():
     while True:
