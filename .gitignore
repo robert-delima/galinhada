@@ -1,2 +1,12 @@
+# Ambiente virtual
+.venv/
+
+# PyCharm
+.idea/
+
+# Cache do Python
 __pycache__/
 *.pyc
+
+# Banco de dados local
+*.db
